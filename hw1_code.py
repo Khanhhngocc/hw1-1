@@ -22,7 +22,7 @@ def load_data():
     X_train, X_temp, y_train, y_temp = train_test_split(X, y, train_size=0.7, random_state=42, stratify=y)
     X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42, stratify=y_temp)
 
-    vectorizer = TfidfVectorizer(stop_words="english", ngram_range=(1, 2))
+    vectorizer = TfidfVectorizer(stop_words="english")
     X_train_converted = vectorizer.fit_transform(X_train)
     X_val_converted = vectorizer.transform(X_val)
     X_test_converted = vectorizer.transform(X_test)
