@@ -7,9 +7,9 @@ from sklearn.tree import plot_tree
 import matplotlib.pyplot as plt
 import numpy as np
 
-def load_data():
-    real_lines = pd.read_csv("clean_real.txt", header=None, names=["headlines"])
-    fake_lines = pd.read_csv("clean_fake.txt", header=None, names=["headlines"])
+def load_data(real_news, fake_news):
+    real_lines = pd.read_csv(real_news, header=None, names=["headlines"])
+    fake_lines = pd.read_csv(fake_news, header=None, names=["headlines"])
 
     fake_lines["label"] = 0
     real_lines["label"] = 1
@@ -19,15 +19,13 @@ def load_data():
     X = data["headlines"]
     y = data["label"]
 
-    X_train, X_temp, y_train, y_temp = train_test_split(X, y, train_size=0.7, random_state=42, stratify=y)
+    vectorizer = TfidfVectorizer()
+    X_converted = vectorizer.fit_transform(X)
+
+    X_train, X_temp, y_train, y_temp = train_test_split(X_converted, y, train_size=0.7, random_state=42, stratify=y)
     X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42, stratify=y_temp)
 
-    vectorizer = TfidfVectorizer(stop_words="english")
-    X_train_converted = vectorizer.fit_transform(X_train)
-    X_val_converted = vectorizer.transform(X_val)
-    X_test_converted = vectorizer.transform(X_test)
-
-    return X_train_converted, X_val_converted, X_test_converted, y_train, y_val, y_test, vectorizer
+    return X_train, X_val, X_test, y_train, y_val, y_test, vectorizer
 
 
 def select_model(X_train, y_train, X_val, y_val, X_test, y_test):
@@ -79,13 +77,13 @@ def select_model(X_train, y_train, X_val, y_val, X_test, y_test):
     #Accuracy of best fit on test set and confusion matrix
     test_accuracy = accuracy_score(y_test, y_test_pred)
     print(f"Test Accuracy: {test_accuracy}")
-    disp = ConfusionMatrixDisplay.from_estimator(
+    ConfusionMatrixDisplay.from_estimator(
         best_clf,
         X_test,
         y_test,
         display_labels=["fake news", "real news"],
     )
-    disp.plot()
+    plt.show()
 
     return best_clf, best_criterion, best_depth, test_accuracy
 
@@ -132,7 +130,7 @@ def compute_information_gain(X, y, keyword, vectorizer):
 
 if __name__ == "__main__":
     #a)
-    X_train, X_val, X_test, y_train, y_val, y_test, vectorizer = load_data()
+    X_train, X_val, X_test, y_train, y_val, y_test, vectorizer = load_data("clean_real.txt", "clean_fake.txt")
 
     #b)
     best_clf, best_criterion, best_depth, test_acc = select_model(
