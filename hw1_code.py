@@ -131,6 +131,14 @@ def compute_information_gain(X, y, keyword, vectorizer):
 if __name__ == "__main__":
     #a)
     X_train, X_val, X_test, y_train, y_val, y_test, vectorizer = load_data("clean_real.txt", "clean_fake.txt")
+    print(f"Training set size: {len(y_train)} examples")
+    print(f"Validation set size: {len(y_val)} examples")
+    print(f"Test set size: {len(y_test)} examples")
+
+    label_map = {0: "fake", 1: "real"}
+    print("Training set distribution:\n", y_train.map(label_map).value_counts())
+    print("Validation set distribution:\n", y_val.map(label_map).value_counts())
+    print("Test set distribution:\n", y_test.map(label_map).value_counts())
 
     #b)
     best_clf, best_criterion, best_depth, test_acc = select_model(
